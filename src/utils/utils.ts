@@ -40,3 +40,20 @@ export const getBoxClass = (boxType: BoxType) => {
   }
   return className;
 };
+
+export const getBoxContent = ({ boxType, weight }: Box) => {
+  switch (boxType) {
+    case 0:
+      return "Start";
+    case 1:
+      return "Target";
+    case 2:
+      return `Wall w=${weight}`;
+    // case 3:
+    //   return "Visited";
+    // case 4:
+    //   return "Empty";
+    // case 5:
+    //   return "Path";
+  }
+};

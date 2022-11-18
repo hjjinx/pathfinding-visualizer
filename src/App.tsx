@@ -1,11 +1,15 @@
-import React, { useState } from 'react';
-import './App.css';
+import React, { useState } from "react";
+import "./App.css";
+import Grid from "./Grid/Grid";
+import { Box } from "./utils/classes";
+import { initializeGrid } from "./utils/utils";
 
 function App() {
+  const [grid, setGrid] = useState<Box[][]>(initializeGrid(50, 75));
   return (
     <div className="App">
       {/* Controls */}
-      {/* Grid */}
+      <Grid grid={grid} />
     </div>
   );
 }

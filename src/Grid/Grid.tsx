@@ -10,12 +10,14 @@ type GridProps = {
 const Grid = (props: GridProps) => {
   const grid = props.grid;
   return (
-    <div className="grid-container">
+    <div className="grid-container" id="grid">
       {grid.map((row, idx) => (
         <div className="grid-row" key={`row-${idx}`}>
           {row.map((box, colIdx) => (
             <div
               className={getBoxClass(box.boxType)}
+              data-i={idx}
+              data-j={colIdx}
               key={`box-${idx}_${colIdx}`}
             ></div>
           ))}

@@ -5,9 +5,40 @@
   display: flex;
   flex-direction: row;
 }
+
 .grid-box {
   box-sizing: border-box;
   border: 0.1px solid black;
   width: 20px;
   height: 20px;
+}
+.grid-box::after {
+  padding: 2px;
+  display: none;
+  position: relative;
+  top: -25px;
+  right: -19px;
+  width: 100px;
+  text-align: center;
+  background-color: #fef4c5;
+  border: 1px solid #d4b943;
+  -moz-border-radius: 2px;
+  -webkit-border-radius: 2px;
+  -ms-border-radius: 2px;
+  border-radius: 2px;
+  font-size: 14px;
+}
+.grid-box:hover::after {
+  display: block;
+}
+
+.start-node {
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='25' height='25'> <circle cx='9.5' cy='9.5' r='8' fill='red'/> </svg>");
+}
+.start-node::after {
+  content: "Start Node";
+}
+
+.wall-node {
+  background-color: grey;
 }

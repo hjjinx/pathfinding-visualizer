@@ -52,3 +52,7 @@
 .wall-node::after {
   content: attr(data-content);
 }
+
+.visited-node {
+  background-color: #d4b943;
+}

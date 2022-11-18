@@ -1,5 +1,6 @@
 import React from "react";
 import { Box } from "../utils/classes";
+import { getBoxClass } from "../utils/utils";
 import "./grid.css";
 
 type GridProps = {
@@ -13,7 +14,10 @@ const Grid = (props: GridProps) => {
       {grid.map((row, idx) => (
         <div className="grid-row" key={`row-${idx}`}>
           {row.map((box, colIdx) => (
-            <div className="grid-box" key={`box-${idx}_${colIdx}`}></div>
+            <div
+              className={getBoxClass(box.boxType)}
+              key={`box-${idx}_${colIdx}`}
+            ></div>
           ))}
         </div>
       ))}

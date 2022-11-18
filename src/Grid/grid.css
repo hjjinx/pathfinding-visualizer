@@ -1,3 +1,13 @@
 .grid-container {
-  flex: 1;
+  display: inline-block;
+}
+.grid-row {
+  display: flex;
+  flex-direction: row;
+}
+.grid-box {
+  box-sizing: border-box;
+  border: 0.1px solid black;
+  width: 20px;
+  height: 20px;
 }

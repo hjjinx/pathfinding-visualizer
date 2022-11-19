@@ -20,6 +20,7 @@ const Grid = (props: GridProps) => {
               data-i={idx}
               data-j={colIdx}
               key={`box-${idx}_${colIdx}`}
+              id={`box-${idx}_${colIdx}`}
             ></div>
           ))}
         </div>

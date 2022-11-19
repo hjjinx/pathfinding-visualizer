@@ -3,7 +3,7 @@ import "./App.css";
 import Grid from "./Grid/Grid";
 import { Box } from "./utils/classes";
 import { BoxProps } from "./utils/types";
-import { initializeGrid } from "./utils/utils";
+import { getBoxClass, initializeGrid } from "./utils/utils";
 
 function App() {
   const [size, setSize] = useState([30, 40]);
@@ -12,20 +12,12 @@ function App() {
     await new Promise((resolve, reject) => setTimeout(resolve, 1));
 
   const updateBox = (i: number, j: number, newBox: BoxProps) => {
-    setGrid(
-      grid.map((row: Box[], idx) =>
-        idx == i
-          ? row.map((box: Box, boxIdx) => {
-              if (boxIdx == j) {
-                box.boxType = newBox.boxType;
-                box.weight = newBox.weight;
-                if (newBox.previousBox) box.previousBox = newBox.previousBox;
-              }
-              return box;
-            })
-          : row
-      )
+    document.getElementById(`box-${i}_${j}`)!.className = getBoxClass(
+      newBox.boxType
     );
+    grid[i][j].boxType = newBox.boxType;
+    grid[i][j].weight = newBox.weight;
+    if (newBox.previousBox) grid[i][j].previousBox = newBox.previousBox;
   };
 
   useEffect(() => {
@@ -99,10 +91,12 @@ function App() {
 
   const findPath = () => {
     setGrid(
-      grid.map((row: Box[]) =>
-        row.map((box: Box) => {
+      grid.map((row: Box[], idx) =>
+        row.map((box: Box, boxIdx) => {
           if (box.boxType == 3 || box.boxType == 5) {
             box.boxType = 4;
+            document.getElementById(`box-${idx}_${boxIdx}`)!.className =
+              getBoxClass(4);
           }
           box.previousBox = undefined;
           return box;

@@ -2,28 +2,28 @@ import React, { useEffect, useState } from "react";
 import "./App.css";
 import Grid from "./Grid/Grid";
 import { Box } from "./utils/classes";
-import { BoxType } from "./utils/types";
+import { BoxProps } from "./utils/types";
 import { initializeGrid } from "./utils/utils";
 
 function App() {
   const [size, setSize] = useState([30, 40]);
   const [grid, setGrid] = useState<Box[][]>(initializeGrid(size[0], size[1]));
+  const sleep = async () =>
+    await new Promise((resolve, reject) => setTimeout(resolve, 1));
 
-  const updateGrid = (i: number, j: number, boxType: BoxType) => {
+  const updateBox = (i: number, j: number, newBox: BoxProps) => {
     setGrid(
       grid.map((row: Box[], idx) =>
-        row.map((box: Box, boxIdx) => {
-          if (
-            idx == i &&
-            boxIdx == j &&
-            box.boxType !== 0 &&
-            box.boxType !== 1
-          ) {
-            box.boxType = boxType;
-            box.weight = 1;
-          }
-          return box;
-        })
+        idx == i
+          ? row.map((box: Box, boxIdx) => {
+              if (boxIdx == j) {
+                box.boxType = newBox.boxType;
+                box.weight = newBox.weight;
+                if (newBox.previousBox) box.previousBox = newBox.previousBox;
+              }
+              return box;
+            })
+          : row
       )
     );
   };
@@ -43,11 +43,13 @@ function App() {
           Number(e.target.dataset.j),
         ];
         movedToIndex = [Number(e.target.dataset.i), Number(e.target.dataset.j)];
-        updateGrid(
-          movedToIndex![0],
-          movedToIndex![1],
-          grid[movedToIndex![0]][movedToIndex![1]].boxType == 4 ? 2 : 4
-        );
+
+        const box = grid[movedToIndex![0]][movedToIndex![1]];
+        if (box.boxType !== 0 && box.boxType !== 1)
+          updateBox(movedToIndex![0], movedToIndex![1], {
+            boxType: box.boxType == 2 ? 4 : 2,
+            weight: 1,
+          });
       } else mouseDownTarget = null;
     };
     document
@@ -61,11 +63,12 @@ function App() {
         movedToTarget &&
         e.target != movedToTarget
       ) {
-        updateGrid(
-          movedToIndex![0],
-          movedToIndex![1],
-          grid[movedToIndex![0]][movedToIndex![1]].boxType == 4 ? 2 : 4
-        );
+        const box = grid[movedToIndex![0]][movedToIndex![1]];
+        if (box.boxType !== 0 && box.boxType !== 1)
+          updateBox(movedToIndex![0], movedToIndex![1], {
+            boxType: box.boxType == 2 ? 4 : 2,
+            weight: 1,
+          });
 
         movedToTarget = e.target;
         movedToIndex = [Number(e.target.dataset.i), Number(e.target.dataset.j)];
@@ -95,11 +98,22 @@ function App() {
   }, []);
 
   const findPath = () => {
+    setGrid(
+      grid.map((row: Box[]) =>
+        row.map((box: Box) => {
+          if (box.boxType == 3 || box.boxType == 5) {
+            box.boxType = 4;
+          }
+          box.previousBox = undefined;
+          return box;
+        })
+      )
+    );
     // using BFS
     performBFS();
   };
 
-  const performBFS = () => {
+  const performBFS = async () => {
     let start = [0, 0];
     let target = [0, 0];
     for (let i = 0; i < size[0]; i++) {
@@ -113,54 +127,63 @@ function App() {
 
     while (queue.length > 0) {
       const node = queue.shift();
-      console.log(node);
       const i = node![0];
       const j = node![1];
-
-      if (
-        i - 1 >= 0 &&
-        grid[i - 1][j].boxType !== 3 &&
-        grid[i - 1][j].boxType !== 2
-      ) {
-        if (i - 1 == target[0] && j == target[1]) return;
-        else {
-          updateGrid(i - 1, j, 3);
+      if (i - 1 >= 0) {
+        if (grid[i - 1][j].boxType == 1) {
+          updateBox(i - 1, j, { boxType: 1, weight: 1, previousBox: [i, j] });
+          break;
+        }
+        if (grid[i - 1][j].boxType == 4) {
+          updateBox(i - 1, j, { boxType: 3, weight: 1, previousBox: [i, j] });
           queue.push([i - 1, j]);
         }
       }
-      if (
-        i + 1 < size[0] &&
-        grid[i + 1][j].boxType !== 3 &&
-        grid[i + 1][j].boxType !== 2
-      ) {
-        if (i + 1 == target[0] && j == target[1]) return;
-        else {
-          updateGrid(i + 1, j, 3);
-          queue.push([i + 1, j]);
+      if (j + 1 < size[1]) {
+        if (grid[i][j + 1].boxType == 1) {
+          updateBox(i, j + 1, { boxType: 1, weight: 1, previousBox: [i, j] });
+          break;
         }
-      }
-      if (
-        j - 1 >= 0 &&
-        grid[i][j - 1].boxType !== 3 &&
-        grid[i][j - 1].boxType !== 2
-      ) {
-        if (i == target[0] && j - 1 == target[1]) return;
-        else {
-          updateGrid(i, j - 1, 3);
-          queue.push([i, j - 1]);
-        }
-      }
-      if (
-        j + 1 < size[1] &&
-        grid[i][j + 1].boxType !== 3 &&
-        grid[i][j + 1].boxType !== 2
-      ) {
-        if (i == target[0] && j + 1 == target[1]) return;
-        else {
-          updateGrid(i, j + 1, 3);
+        if (grid[i][j + 1].boxType == 4) {
+          updateBox(i, j + 1, { boxType: 3, weight: 1, previousBox: [i, j] });
           queue.push([i, j + 1]);
         }
       }
+      if (i + 1 < size[0] && grid[i + 1][j].boxType == 4) {
+        if (grid[i + 1][j].boxType == 1) {
+          updateBox(i + 1, j, { boxType: 1, weight: 1, previousBox: [i, j] });
+          break;
+        }
+        if (grid[i + 1][j].boxType == 4) {
+          updateBox(i + 1, j, { boxType: 3, weight: 1, previousBox: [i, j] });
+          queue.push([i + 1, j]);
+        }
+      }
+      if (j - 1 >= 0 && grid[i][j - 1].boxType == 4) {
+        if (grid[i][j - 1].boxType == 1) {
+          updateBox(i, j - 1, { boxType: 1, weight: 1, previousBox: [i, j] });
+          break;
+        }
+        if (grid[i][j - 1].boxType == 4) {
+          updateBox(i, j - 1, { boxType: 3, weight: 1, previousBox: [i, j] });
+          queue.push([i, j - 1]);
+        }
+      }
+      await sleep();
+    }
+    let box = grid[target[0]][target[1]];
+    if (!box.previousBox) return;
+    let previousBox = grid[box.previousBox![0]][box.previousBox![1]];
+    while (box.previousBox) {
+      updateBox(box.previousBox[0], box.previousBox[1], {
+        boxType: 5,
+        weight: 1,
+      });
+      await sleep();
+      box = previousBox;
+      previousBox =
+        grid[previousBox.previousBox![0]][previousBox.previousBox![1]];
+      if (previousBox.boxType == 0) break;
     }
   };
 

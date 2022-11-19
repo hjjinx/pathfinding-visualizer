@@ -11,6 +11,7 @@
   border: 0.1px solid black;
   width: 20px;
   height: 20px;
+  transition: all 100ms;
 }
 .grid-box::after {
   padding: 2px;
@@ -55,4 +56,8 @@
 
 .visited-node {
   background-color: #d4b943;
+}
+
+.path-node {
+  background-color: aqua;
 }

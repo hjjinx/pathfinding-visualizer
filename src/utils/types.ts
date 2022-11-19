@@ -9,4 +9,5 @@ export type BoxType = 0 | 1 | 2 | 3 | 4 | 5;
 export type BoxProps = {
   boxType: BoxType;
   weight: number;
+  previousBox?: [number, number];
 };

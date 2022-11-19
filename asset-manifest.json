@@ -1,0 +1,13 @@
+{
+  "files": {
+    "main.css": "/pathfinding-visualizer/static/css/main.5b4e6e88.css",
+    "main.js": "/pathfinding-visualizer/static/js/main.fbf8fd1b.js",
+    "index.html": "/pathfinding-visualizer/index.html",
+    "main.5b4e6e88.css.map": "/pathfinding-visualizer/static/css/main.5b4e6e88.css.map",
+    "main.fbf8fd1b.js.map": "/pathfinding-visualizer/static/js/main.fbf8fd1b.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.5b4e6e88.css",
+    "static/js/main.fbf8fd1b.js"
+  ]
+}

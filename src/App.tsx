@@ -149,7 +149,7 @@ function App() {
           queue.push([i, j + 1]);
         }
       }
-      if (i + 1 < size[0] && grid[i + 1][j].boxType == 4) {
+      if (i + 1 < size[0]) {
         if (grid[i + 1][j].boxType == 1) {
           updateBox(i + 1, j, { boxType: 1, weight: 1, previousBox: [i, j] });
           break;
@@ -159,7 +159,7 @@ function App() {
           queue.push([i + 1, j]);
         }
       }
-      if (j - 1 >= 0 && grid[i][j - 1].boxType == 4) {
+      if (j - 1 >= 0) {
         if (grid[i][j - 1].boxType == 1) {
           updateBox(i, j - 1, { boxType: 1, weight: 1, previousBox: [i, j] });
           break;

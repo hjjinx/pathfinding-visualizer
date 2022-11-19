@@ -8,8 +8,10 @@ import { getBoxClass, initializeGrid } from "./utils/utils";
 function App() {
   const [size, setSize] = useState([30, 40]);
   const [grid, setGrid] = useState<Box[][]>(initializeGrid(size[0], size[1]));
-  const sleep = async () =>
-    await new Promise((resolve, reject) => setTimeout(resolve, 1));
+  const [speed, setSpeed] = useState<number>(1);
+
+  const sleep = async (time: number) =>
+    await new Promise((resolve, reject) => setTimeout(resolve, time));
 
   const updateBox = (i: number, j: number, newBox: BoxProps) => {
     document.getElementById(`box-${i}_${j}`)!.className = getBoxClass(
@@ -103,11 +105,11 @@ function App() {
         })
       )
     );
-    // using BFS
-    performBFS();
+    // using BFS/DFS
+    performBruteforce(true);
   };
 
-  const performBFS = async () => {
+  const performBruteforce = async (isBFS: boolean) => {
     let start = [0, 0];
     let target = [0, 0];
     for (let i = 0; i < size[0]; i++) {
@@ -117,53 +119,68 @@ function App() {
       }
     }
 
-    const queue = [start];
+    const ds = [start];
 
-    while (queue.length > 0) {
-      const node = queue.shift();
+    while (ds.length > 0) {
+      const node = isBFS ? ds.shift() : ds.pop();
       const i = node![0];
       const j = node![1];
+      const box = grid[i][j];
+      // box is target or box is present in ds
+      if (box.boxType == 1 || box.boxType == 4) {
+        updateBox(i, j, {
+          boxType: box.boxType == 1 ? 1 : 3,
+          weight: 1,
+          previousBox: [box.previousBox![0], box.previousBox![1]],
+        });
+        if (box.boxType == 1) break;
+      }
+      await sleep(speed);
+
       if (i - 1 >= 0) {
-        if (grid[i - 1][j].boxType == 1) {
-          updateBox(i - 1, j, { boxType: 1, weight: 1, previousBox: [i, j] });
-          break;
-        }
-        if (grid[i - 1][j].boxType == 4) {
-          updateBox(i - 1, j, { boxType: 3, weight: 1, previousBox: [i, j] });
-          queue.push([i - 1, j]);
+        const boxType = grid[i - 1][j].boxType;
+        if (boxType == 4 || boxType == 1) {
+          updateBox(i - 1, j, {
+            boxType: isBFS ? (boxType == 4 ? 3 : 1) : boxType,
+            weight: 1,
+            previousBox: [i, j],
+          });
+          ds.push([i - 1, j]);
         }
       }
       if (j + 1 < size[1]) {
-        if (grid[i][j + 1].boxType == 1) {
-          updateBox(i, j + 1, { boxType: 1, weight: 1, previousBox: [i, j] });
-          break;
-        }
-        if (grid[i][j + 1].boxType == 4) {
-          updateBox(i, j + 1, { boxType: 3, weight: 1, previousBox: [i, j] });
-          queue.push([i, j + 1]);
+        const boxType = grid[i][j + 1].boxType;
+        if (boxType == 4 || boxType == 1) {
+          updateBox(i, j + 1, {
+            boxType: isBFS ? (boxType == 4 ? 3 : 1) : boxType,
+            weight: 1,
+            previousBox: [i, j],
+          });
+          ds.push([i, j + 1]);
         }
       }
       if (i + 1 < size[0]) {
-        if (grid[i + 1][j].boxType == 1) {
-          updateBox(i + 1, j, { boxType: 1, weight: 1, previousBox: [i, j] });
-          break;
-        }
-        if (grid[i + 1][j].boxType == 4) {
-          updateBox(i + 1, j, { boxType: 3, weight: 1, previousBox: [i, j] });
-          queue.push([i + 1, j]);
+        const boxType = grid[i + 1][j].boxType;
+        if (boxType == 4 || boxType == 1) {
+          updateBox(i + 1, j, {
+            boxType: isBFS ? (boxType == 4 ? 3 : 1) : boxType,
+            weight: 1,
+            previousBox: [i, j],
+          });
+          ds.push([i + 1, j]);
         }
       }
       if (j - 1 >= 0) {
-        if (grid[i][j - 1].boxType == 1) {
-          updateBox(i, j - 1, { boxType: 1, weight: 1, previousBox: [i, j] });
-          break;
-        }
-        if (grid[i][j - 1].boxType == 4) {
-          updateBox(i, j - 1, { boxType: 3, weight: 1, previousBox: [i, j] });
-          queue.push([i, j - 1]);
+        const boxType = grid[i][j - 1].boxType;
+        if (boxType == 4 || boxType == 1) {
+          updateBox(i, j - 1, {
+            boxType: isBFS ? (boxType == 4 ? 3 : 1) : boxType,
+            weight: 1,
+            previousBox: [i, j],
+          });
+          ds.push([i, j - 1]);
         }
       }
-      await sleep();
     }
     let box = grid[target[0]][target[1]];
     if (!box.previousBox) return;
@@ -173,7 +190,7 @@ function App() {
         boxType: 5,
         weight: 1,
       });
-      await sleep();
+      await sleep(speed * 10);
       box = previousBox;
       previousBox =
         grid[previousBox.previousBox![0]][previousBox.previousBox![1]];

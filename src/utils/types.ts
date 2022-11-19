@@ -11,3 +11,5 @@ export type BoxProps = {
   weight: number;
   previousBox?: [number, number];
 };
+
+export type Algorithms = "Breadth First Search" | "Depth First Search";

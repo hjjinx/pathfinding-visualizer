@@ -1,14 +1,23 @@
+import { Typography } from "@mui/material";
 import React, { useEffect, useState } from "react";
 import "./App.css";
+import Controls from "./Controls";
 import Grid from "./Grid/Grid";
+import Header from "./Header";
 import { Box } from "./utils/classes";
-import { BoxProps } from "./utils/types";
+import { Algorithms, BoxProps } from "./utils/types";
 import { getBoxClass, initializeGrid } from "./utils/utils";
 
+const SIZE = [30, 40];
+
 function App() {
-  const [size, setSize] = useState([30, 40]);
-  const [grid, setGrid] = useState<Box[][]>(initializeGrid(size[0], size[1]));
+  const [grid, setGrid] = useState<Box[][]>(initializeGrid(SIZE[0], SIZE[1]));
   const [speed, setSpeed] = useState<number>(1);
+  const [algorithmSelected, setAlgorithmSelected] = useState<Algorithms>(
+    "Breadth First Search"
+  );
+  const [isStarted, setIsStarted] = useState(false);
+  const [type, setType] = useState("obstacle");
 
   const sleep = async (time: number) =>
     await new Promise((resolve, reject) => setTimeout(resolve, time));
@@ -39,7 +48,29 @@ function App() {
         movedToIndex = [Number(e.target.dataset.i), Number(e.target.dataset.j)];
 
         const box = grid[movedToIndex![0]][movedToIndex![1]];
-        if (box.boxType !== 0 && box.boxType !== 1)
+        console.log(type);
+        if (type == "start" || type == "target") {
+          let start = [0, 0];
+          let target = [0, 0];
+          for (let i = 0; i < SIZE[0]; i++) {
+            for (let j = 0; j < SIZE[1]; j++) {
+              if (grid[i][j].boxType == 0) start = [i, j];
+              if (grid[i][j].boxType == 1) target = [i, j];
+            }
+          }
+          updateBox(
+            type == "start" ? start[0] : target[0],
+            type == "start" ? start[1] : target[1],
+            {
+              boxType: 4,
+              weight: 1,
+            }
+          );
+          updateBox(movedToIndex![0], movedToIndex![1], {
+            boxType: type == "start" ? 0 : 1,
+            weight: 1,
+          });
+        } else if (box.boxType !== 0 && box.boxType !== 1)
           updateBox(movedToIndex![0], movedToIndex![1], {
             boxType: box.boxType == 2 ? 4 : 2,
             weight: 1,
@@ -89,9 +120,9 @@ function App() {
         .getElementById("grid")
         ?.removeEventListener("mousemove", mouseMoveListener);
     };
-  }, []);
+  }, [type]);
 
-  const findPath = () => {
+  const findPath = async () => {
     setGrid(
       grid.map((row: Box[], idx) =>
         row.map((box: Box, boxIdx) => {
@@ -106,14 +137,23 @@ function App() {
       )
     );
     // using BFS/DFS
-    performBruteforce(true);
+    setIsStarted(true);
+    switch (algorithmSelected) {
+      case "Breadth First Search":
+        await performBruteforce(true);
+        break;
+      case "Depth First Search":
+        await performBruteforce(false);
+        break;
+    }
+    setIsStarted(false);
   };
 
   const performBruteforce = async (isBFS: boolean) => {
     let start = [0, 0];
     let target = [0, 0];
-    for (let i = 0; i < size[0]; i++) {
-      for (let j = 0; j < size[1]; j++) {
+    for (let i = 0; i < SIZE[0]; i++) {
+      for (let j = 0; j < SIZE[1]; j++) {
         if (grid[i][j].boxType == 0) start = [i, j];
         if (grid[i][j].boxType == 1) target = [i, j];
       }
@@ -148,7 +188,7 @@ function App() {
           ds.push([i - 1, j]);
         }
       }
-      if (j + 1 < size[1]) {
+      if (j + 1 < SIZE[1]) {
         const boxType = grid[i][j + 1].boxType;
         if (boxType == 4 || boxType == 1) {
           updateBox(i, j + 1, {
@@ -159,7 +199,7 @@ function App() {
           ds.push([i, j + 1]);
         }
       }
-      if (i + 1 < size[0]) {
+      if (i + 1 < SIZE[0]) {
         const boxType = grid[i + 1][j].boxType;
         if (boxType == 4 || boxType == 1) {
           updateBox(i + 1, j, {
@@ -190,7 +230,7 @@ function App() {
         boxType: 5,
         weight: 1,
       });
-      await sleep(speed * 10);
+      await sleep(speed + 10);
       box = previousBox;
       previousBox =
         grid[previousBox.previousBox![0]][previousBox.previousBox![1]];
@@ -200,9 +240,30 @@ function App() {
 
   return (
     <div className="App">
-      {/* Controls */}
-      <Grid grid={grid} />
-      <button onClick={findPath}> Find Path</button>
+      <Header
+        algorithmSelected={algorithmSelected}
+        setAlgorithmSelected={setAlgorithmSelected}
+        speed={speed}
+        setSpeed={setSpeed}
+        start={findPath}
+        isStarted={isStarted}
+      />
+      <Typography id="Heading" style={{ marginTop: 20, marginBottom: 20 }}>
+        {!!isStarted ? (
+          "Pathfinding in Progress. Refresh the page in order to start again."
+        ) : (
+          <>
+            Select the pathfinding algorithm from top-left and click the Start
+            button on top-right to start. <br />
+            Select type of placement from left, and edit by clicking on cells in
+            the grid
+          </>
+        )}
+      </Typography>
+      <main className="main">
+        <Controls isStarted={isStarted} type={type} setType={setType} />
+        <Grid grid={grid} speed={speed} />
+      </main>
     </div>
   );
 }

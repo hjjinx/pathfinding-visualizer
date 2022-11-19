@@ -1,5 +1,6 @@
 .grid-container {
   display: inline-block;
+  align-self: center;
 }
 .grid-row {
   display: flex;
@@ -8,7 +9,7 @@
 
 .grid-box {
   box-sizing: border-box;
-  border: 0.1px solid black;
+  border: 0.1px solid white;
   width: 20px;
   height: 20px;
   transition: all 100ms;

@@ -48,7 +48,7 @@ export const getBoxContent = ({ boxType, weight }: Box) => {
     case 1:
       return "Target";
     case 2:
-      return `Wall w=${weight}`;
+      return `Wall`;
     // case 3:
     //   return "Visited";
     // case 4:

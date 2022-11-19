@@ -1,0 +1,60 @@
+.App {
+  text-align: center;
+  min-height: 100vh;
+  background-color: var(--primary);
+}
+
+.main {
+  background-color: var(--primary);
+  display: flex;
+  flex-direction: row;
+  padding: 2vh 0;
+  justify-content: space-around;
+}
+.controls {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+}
+
+.header {
+  background-color: blueviolet;
+  flex-direction: row;
+  display: flex;
+}
+
+.MuiButton-root {
+  margin: 10px !important;
+  float: right;
+}
+.MuiTab-root {
+  color: white !important;
+}
+.MuiTabs-indicator {
+  background-color: cornsilk !important;
+}
+.MuiInputLabel-root {
+  color: cornsilk;
+}
+.MuiOutlinedInput-notchedOutline {
+  border-color: #ccc !important;
+}
+.MuiSelect-icon {
+  color: #ccc !important;
+}
+.MuiTypography-root {
+  color: white;
+}
+.MuiInputBase-formControl {
+  width: 10vw !important;
+  color: white !important;
+  background: var(--primary) !important;
+  height: 100% !important;
+}
+.MuiFormControl-root {
+  height: 36.5px;
+  margin: 10px 0 !important;
+}
+.MuiFormLabel-root {
+  color: white !important;
+}

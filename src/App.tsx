@@ -38,6 +38,7 @@ function App() {
     let movedToIndex: number[] | null = null;
 
     const mouseDownListener = (e: MouseEvent) => {
+      if (isStarted) return;
       if (e.target instanceof HTMLDivElement && e?.target?.dataset?.i) {
         mouseDownTarget = e.target;
         movedToTarget = e.target;
@@ -48,8 +49,12 @@ function App() {
         movedToIndex = [Number(e.target.dataset.i), Number(e.target.dataset.j)];
 
         const box = grid[movedToIndex![0]][movedToIndex![1]];
-        console.log(type);
-        if (type == "start" || type == "target") {
+        if (
+          (type == "start" &&
+            grid[movedToIndex![0]][movedToIndex![1]].boxType != 1) ||
+          (type == "target" &&
+            grid[movedToIndex![0]][movedToIndex![1]].boxType != 0)
+        ) {
           let start = [0, 0];
           let target = [0, 0];
           for (let i = 0; i < SIZE[0]; i++) {
@@ -82,6 +87,7 @@ function App() {
       ?.addEventListener("mousedown", mouseDownListener);
 
     const mouseMoveListener = (e: MouseEvent) => {
+      if (isStarted) return;
       if (!mouseDownIndex) return;
       if (
         e.target instanceof HTMLDivElement &&
@@ -158,7 +164,6 @@ function App() {
         if (grid[i][j].boxType == 1) target = [i, j];
       }
     }
-
     const ds = [start];
 
     while (ds.length > 0) {
@@ -226,14 +231,16 @@ function App() {
     if (!box.previousBox) return;
     let previousBox = grid[box.previousBox![0]][box.previousBox![1]];
     while (box.previousBox) {
+      if (grid[box.previousBox[0]][box.previousBox[1]].boxType == 0) return;
       updateBox(box.previousBox[0], box.previousBox[1], {
         boxType: 5,
         weight: 1,
       });
       await sleep(speed + 10);
       box = previousBox;
-      previousBox =
-        grid[previousBox.previousBox![0]][previousBox.previousBox![1]];
+      if (previousBox.previousBox)
+        previousBox =
+          grid[previousBox.previousBox![0]][previousBox.previousBox![1]];
       if (previousBox.boxType == 0) break;
     }
   };
